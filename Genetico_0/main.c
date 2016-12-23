@@ -6,8 +6,8 @@
 #include <GLFW/glfw3.h>
 
 #define PI 3.14159265358979323846
-#define MAX_FOOD 200
-#define MAX_CELLS 200
+#define MAX_FOOD 2000
+#define MAX_CELLS 2000
 
 #define frand(a) (((float)rand()/(float)(RAND_MAX)) * a)
 #define toDegrees(x) (x * (180 / PI))
@@ -96,6 +96,10 @@ int getMax(int val1, int val2) {
 	return val1 > val2 ? val1 : val2;
 }
 
+int intClamp(int min, int val, int max) {
+	return val < min ? min : val > max ? max : val;
+}
+
 bool contains(int* arr, int val)
 {
 	if (arr == NULL)
@@ -167,27 +171,21 @@ void geraMutacao(cell *pai, cell *filho, int numChanges, int variability) {
 
 	int amount = (rand() % (variability * 2)) - variability;
 
-	filho->str = pai->str + amount > 10 ?
-		10 : pai->str + amount < 1 ?
-		1 : pai->str + amount;
+	filho->str = intClamp(1, pai->str + amount, 10);
 
 	amount = (rand() % (variability * 2)) - variability;
-	filho->intl = pai->intl + amount > 10 ?
-		10 : pai->intl + amount < 1 ?
-		1 : pai->intl + amount;
+
+	filho->intl = intClamp(1, pai->intl + amount, 10);
 
 	amount = (rand() % (variability * 2)) - variability;
-	filho->stm = pai->stm + amount > 10 ?
-		10 : pai->stm + amount < 1 ?
-		1 : pai->stm + amount;
+
+	filho->stm = intClamp(1, pai->stm + amount, 10);
 
 	filho->HP = filho->stm * 10;
 
 	amount = (rand() % (variability * 2)) - variability;
-	filho->agl = pai->agl + amount > 10 ?
-		10 : pai->agl + amount < 1 ?
-		1 : pai->agl + amount;
-
+	
+	filho->agl = intClamp(1, pai->agl + amount, 10);
 
 	filho->radius = filho->intl / 100.f;
 	filho->speed = filho->agl / 10.f;
@@ -348,7 +346,7 @@ int main() {
 		currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		//printf("%f\n", deltaTime * 1000);
+		printf("%f\n", deltaTime * 1000);
 
 		float ratio;
 		int width, heigth;
@@ -375,25 +373,25 @@ int main() {
 		for (int i = 0; i < MAX_CELLS; i++)
 		{
 			goToTarget(celulas[i], deltaTime / 2);
-			//drawQuad(&(celulas[i])->body);
-			//drawCircle(celulas[i]);
+			drawQuad(&(celulas[i])->body);
+			drawCircle(celulas[i]);
 			//geraMutacao(celulas[i], celulas[i], 4, 6);
 		}
 
-		for (int celNum = 0; celNum < MAX_CELLS; celNum++) {
-			for (int foodNum = 0; foodNum < MAX_FOOD; foodNum++) {
-				if (circleDetection(celulas[celNum], foodArray[foodNum])) {
-					celulas[celNum]->body.size = (v2) { 0.02, 0.02 };
-					celulas[celNum]->body.col = (color) { 0, 0, 1 };
-					drawQuad(&(celulas[celNum])->body);
-				}
-				else {
-					celulas[celNum]->body.size = (v2) { 0.01, 0.01 };
-					celulas[celNum]->body.col = (color) { 1, 0, 1 };
-					drawQuad(&(celulas[celNum])->body);
-				}
-			}
-		}
+		//for (int celNum = 0; celNum < MAX_CELLS; celNum++) {
+		//	for (int foodNum = 0; foodNum < MAX_FOOD; foodNum++) {
+		//		if (circleDetection(celulas[celNum], foodArray[foodNum])) {
+		//			celulas[celNum]->body.size = (v2) { 0.02, 0.02 };
+		//			celulas[celNum]->body.col = (color) { 0, 0, 1 };
+		//			drawQuad(&(celulas[celNum])->body);
+		//		}
+		//		else {
+		//			celulas[celNum]->body.size = (v2) { 0.01, 0.01 };
+		//			celulas[celNum]->body.col = (color) { 1, 0, 1 };
+		//			drawQuad(&(celulas[celNum])->body);
+		//		}
+		//	}
+		//}
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
