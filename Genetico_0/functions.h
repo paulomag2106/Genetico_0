@@ -13,6 +13,11 @@
 #define frand(a) (((float)rand()/(float)(RAND_MAX)) * a)
 #define toDegrees(x) (x * (180 / M_PI))
 
+// global variables
+int width, height;
+int size;
+double x, y;
+
 // structs
 
 typedef struct {

@@ -1,5 +1,6 @@
 #include "functions.h"
 
+
 v2 createtarget()
 {
 	return (v2) { (frand(35*30) - (35*15)), (frand(35*30) - (35*15)) };
@@ -183,7 +184,7 @@ void generateMap(terrain *map, int matrixX, int matrixY) {
 	for(int i = 0; i < numTris;i++)
 		map->mesh[i] = malloc(sizeof(v3) * 3);
 	map->nodes = malloc(sizeof(node) * numTris);
-	int size = 35;
+	size = 100;
 	v3 offset = {-size*(matrixX)/2, -size*(matrixY/2), 0};
 	// v3 offset = {0, 0, 0};
 
@@ -193,17 +194,11 @@ void generateMap(terrain *map, int matrixX, int matrixY) {
 			map->mesh[index][0] = (v3){offset.x+(j*size), offset.y+(i*size), 0};
 			map->mesh[index][1] = (v3){offset.x+(j*size), offset.y+((i+1)*size), 0};
 			map->mesh[index][2] = (v3){offset.x+((j+1)*size), offset.y+(i*size), 0};
-			// printf("%d\n", index);
-		}
-	}
 
-	for(int i = 0; i < matrixY;i++) {
-		for(int j = 0;j < matrixX;j++) {
-			int index = 900 + i*matrixX + j;
+			index = 900 + i*matrixX + j;
 			map->mesh[index][0] = (v3){offset.x+((j)*size), offset.y+((i+1)*size), 0};
 			map->mesh[index][1] = (v3){offset.x+((j+1)*size), offset.y+((i+1)*size), 0};
 			map->mesh[index][2] = (v3){offset.x+((j+1)*size), offset.y+(i*size), 0};
-			// printf("%d\n", index);
 		}
 	}
 
@@ -218,5 +213,6 @@ void generateMap(terrain *map, int matrixX, int matrixY) {
 }
 
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset) {
-	printf("%lf, %lf\n", xOffset, yOffset);
+	y += yOffset;
+	// printf("%lf, %lf\n", xOffset, yOffset);
 }

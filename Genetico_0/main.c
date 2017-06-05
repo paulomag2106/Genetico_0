@@ -1,6 +1,7 @@
 #include "functions.h"
 
 int main() {
+	float theta = 0;
 
 	float xVal = 0, yVal = 0;
 	float deltaTime, currentFrame = 0, lastFrame = 0;
@@ -44,11 +45,11 @@ int main() {
 		lastFrame = currentFrame;
 
 		float ratio;
-		int width, height;
 
 		glfwGetFramebufferSize(window, &width, &height);
 		ratio = width / (float)height;
 		glViewport(0, 0, width, height);
+		glfwSetScrollCallback(window, scroll_callback);
 
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -56,9 +57,10 @@ int main() {
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		// glOrtho(-width/2, width/2, -height/2, height/2, -1, 1);
-		glFrustum(-width/2, width/2, -height/2, height/2, 1, 1000);
+		glFrustum(-width/2, width/2, -height/2, height/2, 10, 10000);
 
-		glTranslatef(0, 0, -1.f);
+		glTranslatef(0, 0, -11+y/20);
+		glRotatef(-0.2, 1, 0, 0);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -68,10 +70,10 @@ int main() {
 		int numTris = 30 * 30 * 2;
 		for(int i = 0;i < numTris;i++) {
 
-			color triColor = map.nodes[i].type == WATER ? (color){0, 0, 1} :
+			color triColor = map.nodes[i].type == WATER ? (color){0, 0, 0.5} :
 											 map.nodes[i].type == SAND ? (color){0.6, 0.6, 0} :
 											 map.nodes[i].type == EARTH ? (color){0.2, 0.2, 0} :
-											 map.nodes[i].type == FERTILE ? (color){0, 1, 0} :
+											 map.nodes[i].type == FERTILE ? (color){0, 0.5, 0} :
 											 map.nodes[i].type == SWAMP ? (color){0, 0.2, 0.2} :
 											 map.nodes[i].type == ROCK ? (color){0.4, 0.4, 0.4} : (color){0, 0, 0};
 
