@@ -7,8 +7,8 @@
 #include <math.h>
 #include <GLFW/glfw3.h>
 
-#define MAX_FOOD 50
-#define MAX_CELLS 20
+#define MAX_FOOD 100
+#define MAX_CELLS 50
 
 #define frand(a) (((float)rand()/(float)(RAND_MAX)) * a)
 #define toDegrees(x) (x * (180 / M_PI))
@@ -23,10 +23,24 @@ typedef struct {
 	float x, y, z;
 } v3;
 
-typedef struct {
-	v3 *mesh;
+enum e_terrain_type {
+	WATER,
+	SAND,
+	EARTH,
+	FERTILE,
+	SWAMP,
+	ROCK
+};
 
-	v3 *nodes;
+typedef struct {
+	v3 pos;
+	enum e_terrain_type type;
+} node;
+
+typedef struct {
+	v3 **mesh;
+
+	node *nodes;
 	v3 *edges;
 
 } terrain;
@@ -41,11 +55,41 @@ typedef struct {
 	color col;
 } quad;
 
-typedef struct t_cell {
-	unsigned char str, intl, con, agl, HP;
+enum e_tags{
+	MALE = 0x1,
+	FEMALE = 0x2,
+	HERBIVORE = 0x01,
+	OMNIVORE = 0x02,
+	CARNIVORE = 0x03,
+};
 
+typedef struct t_cell {
+
+	// IDENTIFICATION
+	// letter(type of feeding, 1 digit)
+	// number(id in current generation, 6 digits)
+	// generation(number, 4 digits)
+	char id[11];
+
+	// current attributes
+	unsigned char str, intl, con, agl;
+	// attributes in peek development
+	unsigned char maxStr, maxIntl, maxCon, maxAgl;
+
+	// qualitative characteristics
+	enum e_tags tags;
+
+	// destination
 	v2 target;
+
+	// body polygon
 	quad body;
+
+	// variable characteristics
+	int feeding;
+	int hydration;
+	float hp;
+	float age;
 	float radius;
 	float speed;
 
@@ -56,22 +100,19 @@ typedef struct t_cell {
 	// linked list pointers
 	struct t_cell *prev;
 	struct t_cell *next;
-}cell;
 
-typedef union {
-	int integer;
-	float decimal;
-}bitwiseCast;
+	// check if it's alive or dead
+	bool isAlive;
+}cell;
 
 // functions
 
 v2 createtarget();
 void changeTarget(cell* cel);
-cell *createCell();
+cell createCell();
 int getMin(int val1, int val2);
 int getMax(int val1, int val2);
 int intClamp(int min, int val, int max);
-bool contains(int* arr, int val);
 void geraMutacao(cell *pai, cell *filho, int numChanges, int variability);
 void drawQuad(quad *body);
 void drawCircle(cell *cel);
@@ -80,3 +121,4 @@ void goToTarget(cell* cel, float deltaTime);
 void initiateFood(quad *foodArray);
 bool circleDetection(cell* cel, quad food);
 void generateMap(terrain *map, int matrixX, int matrixY);
+void scroll_callback(GLFWwindow* window, double xOffset, double yOffset);

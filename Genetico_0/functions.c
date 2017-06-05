@@ -2,7 +2,7 @@
 
 v2 createtarget()
 {
-	return (v2) { 100*(frand(4.6) - 2.3), 100*(frand(2.8) - 1.4) };
+	return (v2) { (frand(35*30) - (35*15)), (frand(35*30) - (35*15)) };
 }
 
 void changeTarget(cell* cel)
@@ -23,22 +23,30 @@ void changeTarget(cell* cel)
 	}
 }
 
-cell *createCell() {
-	cell *p = (cell *)malloc(sizeof(cell));
-	p->str = (rand() % 10) + 1;
-	p->intl = (rand() % 10) + 1;
-	p->con = (rand() % 10) + 1;
-	p->agl = (rand() % 10) + 1;
+cell createCell() {
+	cell p;
 
-	p->HP = p->con * 10;
-	p->radius = p->intl;
-	p->speed = p->agl;
+	// target developed attributes
+	p.maxStr = (rand() % 10) + 1;
+	p.maxIntl = (rand() % 10) + 1;
+	p.maxCon = (rand() % 10) + 1;
+	p.maxAgl = (rand() % 10) + 1;
 
-	p->body.pos = createtarget();//(v2) { 0, 0 };
-	p->body.size = (v2) { 10, 10 };
-	p->body.col = (color) { 1, 0, 1 };
+	// starting attributes
+	p.str =1;
+	p.intl = 1;
+	p.con = 1;
+	p.agl = 1;
 
-	p->target = createtarget();
+	p.hp = p.con * 10;
+	p.radius = p.intl * 10;
+	p.speed = p.agl * 10;
+
+	p.body.pos = createtarget();
+	p.body.size = (v2) { 10, 10 };
+	p.body.col = (color) { 1, 0, 1 };
+
+	p.target = createtarget();
 
 	return p;
 }
@@ -55,19 +63,6 @@ int intClamp(int min, int val, int max) {
 	return val < min ? min : val > max ? max : val;
 }
 
-bool contains(int* arr, int val)
-{
-	if (arr == NULL)
-		return false;
-
-	for (int i = 0; i < sizeof(arr); i++)
-		if (arr[i] == val)
-			return true;
-
-	return false;
-}
-
-
 void geraMutacao(cell *pai, cell *filho, int numChanges, int variability) {
 
 	int amount = (rand() % (variability * 2)) - variability;
@@ -82,7 +77,7 @@ void geraMutacao(cell *pai, cell *filho, int numChanges, int variability) {
 
 	filho->con = intClamp(1, pai->con + amount, 10);
 
-	filho->HP = filho->con * 10;
+	filho->hp = filho->con * 10;
 
 	amount = (rand() % (variability * 2)) - variability;
 
@@ -145,12 +140,16 @@ void goToTarget(cell* cel, float deltaTime)
 	float yDist = (cel->target.y - cel->body.pos.y);
 	float xDist = (cel->target.x - cel->body.pos.x);
 
-	float theta = atan2(yDist, xDist);
+	if(xDist < 1 && yDist < 1){
+		changeTarget(cel);
+	} else {
+		float theta = atan2(yDist, xDist);
 
-		x = cosf(theta);
-		y = sinf(theta);
+			x = cosf(theta);
+			y = sinf(theta);
 
-  moveQuad(&(cel->body), deltaTime*x*cel->speed, deltaTime*y*cel->speed);
+	  moveQuad(&(cel->body), deltaTime*x*cel->speed, deltaTime*y*cel->speed);
+	}
 }
 
 void initiateFood(quad *foodArray) {
@@ -160,7 +159,7 @@ void initiateFood(quad *foodArray) {
 		//srand((unsigned int)time(NULL));
 		foodArray[i].col = (color) { 0, 1, 0 };
 		foodArray[i].size = (v2) { 10, 10 };
-		foodArray[i].pos = (v2) { 100*(frand(3.6) - 1.8), 100*(frand(1.8) - 0.9)};
+		foodArray[i].pos = (v2) { (frand(35*30) - (35*15)), (frand(35*30) - (35*15))};
 		//printf("%f, %f\n", foodArray[i].pos.x, foodArray[i].pos.y);
 	}
 }
@@ -176,5 +175,48 @@ bool circleDetection(cell* cel, quad food) {
 }
 
 void generateMap(terrain *map, int matrixX, int matrixY) {
-	map->mesh
+
+	int numTris = 2*matrixX * matrixY;
+
+	map->mesh = malloc(sizeof(v3 *) * numTris);
+	// printf("%d\n", numTris);
+	for(int i = 0; i < numTris;i++)
+		map->mesh[i] = malloc(sizeof(v3) * 3);
+	map->nodes = malloc(sizeof(node) * numTris);
+	int size = 35;
+	v3 offset = {-size*(matrixX)/2, -size*(matrixY/2), 0};
+	// v3 offset = {0, 0, 0};
+
+	for(int i = 0; i < matrixY;i++) {
+		for(int j = 0; j < matrixX;j++) {
+			int index = i*matrixX + j;
+			map->mesh[index][0] = (v3){offset.x+(j*size), offset.y+(i*size), 0};
+			map->mesh[index][1] = (v3){offset.x+(j*size), offset.y+((i+1)*size), 0};
+			map->mesh[index][2] = (v3){offset.x+((j+1)*size), offset.y+(i*size), 0};
+			// printf("%d\n", index);
+		}
+	}
+
+	for(int i = 0; i < matrixY;i++) {
+		for(int j = 0;j < matrixX;j++) {
+			int index = 900 + i*matrixX + j;
+			map->mesh[index][0] = (v3){offset.x+((j)*size), offset.y+((i+1)*size), 0};
+			map->mesh[index][1] = (v3){offset.x+((j+1)*size), offset.y+((i+1)*size), 0};
+			map->mesh[index][2] = (v3){offset.x+((j+1)*size), offset.y+(i*size), 0};
+			// printf("%d\n", index);
+		}
+	}
+
+	for(int i = 0;i < numTris;i++) {
+
+		map->nodes[i].pos = (v3){(map->mesh[i][0].x+map->mesh[i][1].x+map->mesh[i][2].x)/3,
+														 (map->mesh[i][0].y+map->mesh[i][1].y+map->mesh[i][2].y)/3,
+													 	 (map->mesh[i][0].z+map->mesh[i][1].z+map->mesh[i][2].z)/3};
+		map->nodes[i].type = (enum e_terrain_type)(rand() % 6);
+	}
+
+}
+
+void scroll_callback(GLFWwindow* window, double xOffset, double yOffset) {
+	printf("%lf, %lf\n", xOffset, yOffset);
 }
