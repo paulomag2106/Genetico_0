@@ -3,7 +3,7 @@
 int main() {
 	float theta = 0;
 
-	float xVal = 0, yVal = 0;
+	size = 256;
 	float deltaTime, currentFrame = 0, lastFrame = 0;
 
 	quad *foodArray = malloc(sizeof(quad) * MAX_FOOD);
@@ -43,6 +43,9 @@ int main() {
 		currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		cls();
+		printf("%.2f FPS\n",1.f/deltaTime);
+		printf("%lf\n", yScroll);
 
 		float ratio;
 
@@ -57,10 +60,10 @@ int main() {
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		// glOrtho(-width/2, width/2, -height/2, height/2, -1, 1);
-		glFrustum(-width/2, width/2, -height/2, height/2, 10, 10000);
+		glFrustum(-width/2, width/2, -height/2, height/2, 5, 10000);
 
-		glTranslatef(0, 0, -11+y/20);
-		glRotatef(-0.2, 1, 0, 0);
+		glTranslatef(0, 0, -11+yScroll/20);
+		// glRotatef(-0.2, 1, 0, 0);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -85,11 +88,11 @@ int main() {
 			glVertex3f(map.mesh[i][2].x, map.mesh[i][2].y, map.mesh[i][2].z);
 			glEnd();
 
-			glPointSize(5);
-			glBegin(GL_POINTS);
-			glColor3f(1, 0, 0);
-			glVertex3f(map.nodes[i].pos.x, map.nodes[i].pos.y, map.nodes[i].pos.z);
-			glEnd();
+			// glPointSize(5);
+			// glBegin(GL_POINTS);
+			// glColor3f(1, 0, 0);
+			// glVertex3f(map.nodes[i].pos.x, map.nodes[i].pos.y, map.nodes[i].pos.z);
+			// glEnd();
 		}
 
 		// draw food
@@ -104,20 +107,20 @@ int main() {
 			drawCircle(&initialCells[i]);
 		}
 
-		for (int celNum = 0; celNum < MAX_CELLS; celNum++) {
-			for (int foodNum = 0; foodNum < MAX_FOOD; foodNum++) {
-				if (circleDetection(&initialCells[celNum], foodArray[foodNum])) {
-					initialCells[celNum].body.size = (v2) {20, 20};
-					initialCells[celNum].body.col = (color) { 0, 0, 1 };
-					drawQuad(&initialCells[celNum].body);
-				}
-				else {
-					initialCells[celNum].body.size = (v2) { 10, 10};
-					initialCells[celNum].body.col = (color) { 1, 0, 1 };
-					drawQuad(&initialCells[celNum].body);
-				}
-			}
-		}
+		// for (int celNum = 0; celNum < MAX_CELLS; celNum++) {
+		// 	for (int foodNum = 0; foodNum < MAX_FOOD; foodNum++) {
+		// 		if (circleDetection(&initialCells[celNum], foodArray[foodNum])) {
+		// 			initialCells[celNum].body.size = (v2) {20, 20};
+		// 			initialCells[celNum].body.col = (color) { 0, 0, 1 };
+		// 			drawQuad(&initialCells[celNum].body);
+		// 		}
+		// 		else {
+		// 			initialCells[celNum].body.size = (v2) { 10, 10};
+		// 			initialCells[celNum].body.col = (color) { 1, 0, 1 };
+		// 			drawQuad(&initialCells[celNum].body);
+		// 		}
+		// 	}
+		// }
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);

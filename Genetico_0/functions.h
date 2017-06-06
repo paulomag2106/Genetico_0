@@ -7,8 +7,8 @@
 #include <math.h>
 #include <GLFW/glfw3.h>
 
-#define MAX_FOOD 100
-#define MAX_CELLS 50
+#define MAX_FOOD 500
+#define MAX_CELLS 300
 
 #define frand(a) (((float)rand()/(float)(RAND_MAX)) * a)
 #define toDegrees(x) (x * (180 / M_PI))
@@ -16,7 +16,7 @@
 // global variables
 int width, height;
 int size;
-double x, y;
+double xScroll, yScroll;
 
 // structs
 
@@ -127,3 +127,4 @@ void initiateFood(quad *foodArray);
 bool circleDetection(cell* cel, quad food);
 void generateMap(terrain *map, int matrixX, int matrixY);
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset);
+void cls(void);

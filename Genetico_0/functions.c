@@ -3,7 +3,7 @@
 
 v2 createtarget()
 {
-	return (v2) { (frand(35*30) - (35*15)), (frand(35*30) - (35*15)) };
+	return (v2) { (frand(size*30) - (size*15)), (frand(size*30) - (size*15)) };
 }
 
 void changeTarget(cell* cel)
@@ -34,14 +34,14 @@ cell createCell() {
 	p.maxAgl = (rand() % 10) + 1;
 
 	// starting attributes
-	p.str =1;
-	p.intl = 1;
-	p.con = 1;
-	p.agl = 1;
+	p.str = p.maxStr;//1;
+	p.intl = p.maxIntl;//1;
+	p.con = p.maxCon;//1;
+	p.agl = p.maxAgl;//1;
 
 	p.hp = p.con * 10;
 	p.radius = p.intl * 10;
-	p.speed = p.agl * 10;
+	p.speed = p.agl * 100;
 
 	p.body.pos = createtarget();
 	p.body.size = (v2) { 10, 10 };
@@ -119,6 +119,9 @@ void drawCircle(cell *cel) {
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	glLineWidth(3);
+	glLineStipple(1, 0x0202);
+  glEnable(GL_LINE_STIPPLE);
 	glBegin(GL_LINE_STRIP);
 
 	glColor3f(1, 1, 1);
@@ -128,6 +131,7 @@ void drawCircle(cell *cel) {
 	}
 
 	glEnd();
+	glDisable(GL_LINE_STIPPLE);
 }
 
 void moveQuad(quad *body, float x, float y) {
@@ -160,7 +164,7 @@ void initiateFood(quad *foodArray) {
 		//srand((unsigned int)time(NULL));
 		foodArray[i].col = (color) { 0, 1, 0 };
 		foodArray[i].size = (v2) { 10, 10 };
-		foodArray[i].pos = (v2) { (frand(35*30) - (35*15)), (frand(35*30) - (35*15))};
+		foodArray[i].pos = (v2) { (frand(size*30) - (size*15)), (frand(size*30) - (size*15))};
 		//printf("%f, %f\n", foodArray[i].pos.x, foodArray[i].pos.y);
 	}
 }
@@ -184,7 +188,6 @@ void generateMap(terrain *map, int matrixX, int matrixY) {
 	for(int i = 0; i < numTris;i++)
 		map->mesh[i] = malloc(sizeof(v3) * 3);
 	map->nodes = malloc(sizeof(node) * numTris);
-	size = 100;
 	v3 offset = {-size*(matrixX)/2, -size*(matrixY/2), 0};
 	// v3 offset = {0, 0, 0};
 
@@ -213,6 +216,10 @@ void generateMap(terrain *map, int matrixX, int matrixY) {
 }
 
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset) {
-	y += yOffset;
-	// printf("%lf, %lf\n", xOffset, yOffset);
+	yScroll += yOffset;
+	yScroll = yScroll > 119 ? 119 : yScroll < -670 ? -670 : yScroll;
+}
+
+void cls(void) {
+    printf("\e[1;1H\e[2J");
 }
